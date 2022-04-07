@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": ".",
+    "baseUrl": ".",
+    "outDir": "./types/generated",
+    "target": "es6",
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "checkJs": false,
+    "plugins": [
+       // transform absolute paths to relative based on "paths" configuration below
+      { "transform": "@zerollup/ts-transform-paths" },
+    ],
+    "paths": {
+      "nls/*": ["./packages/@okta/i18n/src/json/*"],
+      "okta": ["./packages/@okta/courage-dist/types/CourageForSigninWidget.d.ts"],
+      "handlebars-inline-precompile": ["./scripts/buildtools/tsc/handlebars-inline-precompile"],
+      "*": ["./src/*"]
+    }
+  },
+  "include": [
+    "types/global*",
+    "src/**/*"
+  ],
+  "exclude": [
+    "target/**/*",
+    "types/generated/**/*"
+  ],
+  "files": [
+    "src/index.ts"
+  ]
+}
