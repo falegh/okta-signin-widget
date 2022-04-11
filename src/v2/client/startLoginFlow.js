@@ -27,6 +27,11 @@ const handleProxyIdxResponse = async (settings) => {
 // eslint-disable-next-line complexity, max-statements
 export async function startLoginFlow(settings) {
   const authClient = settings.getAuthClient();
+  const idxOptions = {
+    exchangeCodeForTokens: false, // we handle this in interactionCodeFlow.js
+    shouldProceedWithEmailAuthenticator: false, // do not auto-select email authenticator
+    // autoRemediate: false // we will proceed manually, when appropriate
+  };
 
   // Return a preset response
   if (settings.get('proxyIdxResponse')) {
@@ -43,9 +48,6 @@ export async function startLoginFlow(settings) {
 
   if (settings.get('useInteractionCodeFlow')) {
     let meta = await authClient.idx.getSavedTransactionMeta();
-    const idxOptions = {
-      exchangeCodeForTokens: false // we handle this in interactionCodeFlow.js
-    };
     if (!meta) {
       // no saved transaction
       // if the configured flow is set to `proceed`, the SIW should only continue an existing idx transaction
@@ -69,7 +71,8 @@ export async function startLoginFlow(settings) {
   const stateHandleFromSession = sessionStorageHelper.getStateHandle();
   if (stateHandleFromSession) {
     try {
-      const idxResp = await authClient.idx.introspect({
+      const idxResp = await authClient.idx.start({
+        ...idxOptions,
         stateHandle: stateHandleFromSession
       });
       const hasError = idxResp.context?.messages?.value.length > 0;
@@ -92,7 +95,10 @@ export async function startLoginFlow(settings) {
   // Use stateToken from options
   const stateHandle = settings.get('stateToken');
   if (stateHandle) {
-    return authClient.idx.introspect({ stateHandle });
+    return authClient.idx.start({
+      ...idxOptions,
+      stateHandle
+    });
   }
 
   throw new Errors.ConfigError('Set "useInteractionCodeFlow" to true in configuration to enable the ' +

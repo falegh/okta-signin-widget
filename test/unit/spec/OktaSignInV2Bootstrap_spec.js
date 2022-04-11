@@ -474,19 +474,14 @@ describe('OktaSignIn v2 bootstrap', function() {
         }, [
           interactResponse,
           idxVerifyPassword,
-          // cancel response
-          {
-            state: 200,
-            responseType: 'json',
-            response: {}
-          },
+          // in interaction code flow it will not call cancel, it will simply start a new transaction
           interactResponse,
           idxResponse
         ]);
         render();
 
         await Expect.wait(() => {
-          return $('.siw-main-body').length === 1;
+          return $('.siw-main-view.mfa-verify-password').length === 1;
         });
         jest.spyOn(signIn.authClient.transactionManager, 'clear');
         const $signOut = $('a[data-se="cancel"]');
