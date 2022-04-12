@@ -28,7 +28,7 @@ declare type AbstractRouter = typeof V1Router | typeof V2Router;
 
 const EVENTS_LIST = ['ready', 'afterError', 'afterRender'];
 
-export class OktaSignIn implements OktaSignInAPI, RouterEventsAPI {
+export default class OktaSignIn implements OktaSignInAPI, RouterEventsAPI {
   Router: AbstractRouter;
   options: WidgetOptions;
   hooks: Hooks;
@@ -69,7 +69,7 @@ export class OktaSignIn implements OktaSignInAPI, RouterEventsAPI {
     this.Router = Router;
 
     // Triggers the event up the chain so it is available to the consumers of the widget.
-    this.Router.prototype.Events.listenTo.call(Router.prototype, 'all', this.trigger);
+    this.Router.prototype.Events.listenTo.call(this, Router.prototype, 'all', this.trigger);
 
     // On the first afterRender event (usually when the Widget is ready) - emit a 'ready' event
     this.once('afterRender', function(context) {
