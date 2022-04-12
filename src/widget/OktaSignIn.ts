@@ -16,7 +16,11 @@ import {
   RenderResult,
   RenderOptions,
   HookFunction,
-  RenderResultSuccess
+  RenderResultSuccess,
+  EventCallback,
+  RouterEventsAPI,
+  EventCallbackWithError,
+  EventName
 } from '../types';
 import { OktaAuth, Tokens } from '@okta/okta-auth-js';
 
@@ -24,7 +28,7 @@ declare type AbstractRouter = typeof V1Router | typeof V2Router;
 
 const EVENTS_LIST = ['ready', 'afterError', 'afterRender'];
 
-class OktaSignIn implements OktaSignInAPI {
+export class OktaSignIn implements OktaSignInAPI, RouterEventsAPI {
   Router: AbstractRouter;
   options: WidgetOptions;
   hooks: Hooks;
@@ -65,7 +69,7 @@ class OktaSignIn implements OktaSignInAPI {
     this.Router = Router;
 
     // Triggers the event up the chain so it is available to the consumers of the widget.
-    this.listenTo(Router.prototype, 'all', this.trigger);
+    this.Router.prototype.Events.listenTo.call(Router.prototype, 'all', this.trigger);
 
     // On the first afterRender event (usually when the Widget is ready) - emit a 'ready' event
     this.once('afterRender', function(context) {
@@ -175,40 +179,39 @@ class OktaSignIn implements OktaSignInAPI {
   
   // Events API
 
-  on(...args: any[]): void {
+  on(event: EventName, callback: EventCallback | EventCallbackWithError): void {
     // custom events listener on widget instance to trap third-party callback errors
-    const [event, callback] = args;
     if (EVENTS_LIST.includes(event)) {
-      args[1] = function(...callbackArgs) {
+      const origCallback = callback;
+      callback = function(...callbackArgs) {
         try {
-          callback.apply(this, callbackArgs);
+          origCallback.apply(this, callbackArgs);
         } catch (err) {
           Logger.error(`[okta-signin-widget] "${event}" event handler error:`, err);
         }
       };
     }
-    this.Router.prototype.Events.on.apply(this, args);
+    this.Router.prototype.Events.on.call(this, event, callback);
   }
 
-  off(...args: any[]): void {
-    this.Router.prototype.Events.off.apply(this, args);
+  off(event?: EventName, callback?: EventCallback | EventCallbackWithError): void {
+    this.Router.prototype.Events.off.call(this, event, callback);
   }
 
-  once(...args: any[]): void {
-    this.Router.prototype.Events.once.apply(this, args);
+  once(event: EventName, callback: EventCallback): void {
+    this.Router.prototype.Events.once.call(this, event, callback);
   }
 
-  stopListening(...args: any[]): void {
-    this.Router.prototype.Events.stopListening.apply(this, args);
+  stopListening(event?: EventName, callback?: EventCallback): void {
+    this.Router.prototype.Events.stopListening.call(this, event, callback);
   }
 
-  listenTo(...args: any[]): void {
-    this.Router.prototype.Events.listenTo.apply(this, args);
+  listenTo(object: any, event: EventName, callback: EventCallback): void {
+    this.Router.prototype.Events.listenTo.call(this, object, event, callback);
   }
 
-  trigger(...args: any[]): void {
-    this.Router.prototype.Events.trigger.apply(this, args);
+  trigger(event: EventName, ...args: any[]): void {
+    this.Router.prototype.Events.trigger.apply(this, [event, ...args]);
   }
+
 }
-
-export default OktaSignIn;

@@ -1,3 +1,6 @@
+/// <reference types="jquery" />
+/// <reference types="jqueryui" />
+/// <reference types="selectize" />
 import Backbone, { _Result } from 'backbone';
 import { SettingsModelClass } from '../util/SettingsModel';
 import { StateMachineClass } from '../util/StateMachine';

@@ -4,6 +4,9 @@ export interface HooksAPI {
   before(eventName, hookFn): void;
   after(eventName, hookFn): void;
 }
+
+export type EventName = 'ready' | 'afterError' | 'afterRender';
+
 export interface RouterEventsAPI {
   on(event: 'ready', callback: EventCallback): void;
   on(event: 'afterError', callback: EventCallbackWithError): void;

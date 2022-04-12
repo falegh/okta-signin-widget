@@ -241,7 +241,7 @@ module.exports = function(grunt) {
       'run-protractor': 'yarn protractor',
       'pseudo-loc': 'node scripts/buildtools pseudo-loc',
       'prepack': 'node scripts/buildtools build:prepack',
-      'generate-types': 'yarn generate:types'
+      'build-types': 'yarn build:types'
     },
 
     sass: {
@@ -380,14 +380,22 @@ module.exports = function(grunt) {
     }
   );
 
+  grunt.task.registerTask('codegen', function() {
+    const tasks = [
+      'propertiesToJSON', // convert .properties to .json
+      'exec:generate-config', // populates src/config.json with supported languages
+      'exec:build-types', // generate typescript declaration files
+    ];
+    grunt.task.run(tasks);
+  });
+
   grunt.task.registerTask('assets', function(target) {
     const prodBuild = target === 'release';
     const buildTasks = [
       'copy:generate-in-translation',
-      'propertiesToJSON',
+      'codegen',
       'copy:app-to-target',
       // 'exec:pseudo-loc', // TODO: Add after OKTA-379995 is completed
-      'exec:generate-config', // populates src/config.json with supported languages
       'sass:build',
     ];
 

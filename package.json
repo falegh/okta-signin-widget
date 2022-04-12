@@ -28,12 +28,14 @@
     "generate-config": "node scripts/buildtools generate-language-config",
     "update-readme": "node scripts/buildtools update-readme",
     "retirejs": "retire --jspath target/js --package",
-    "lint:eslint": "eslint . --ext .js --ext .ts",
+    "lint:types": "eslint --no-ignore --no-eslintrc --no-inline-config --config scripts/buildtools/eslint/.eslintrc.types.js --ext .ts types",
+    "lint:types:report": "eslint -f checkstyle -o build2/OSW-eslint-types-checkstyle-result.xml --no-ignore --no-eslintrc --no-inline-config --config scripts/buildtools/eslint/.eslintrc.types.js --ext .ts types",
+    "lint:eslint": "yarn lint:types && eslint . --ext .js --ext .ts",
     "lint:eslint:report": "eslint -f checkstyle -o build2/OSW-eslint-checkstyle-result.xml . --quiet",
     "lint:stylelint": "stylelint assets/sass/",
     "lint:stylelint:report": "stylelint --custom-formatter node_modules/stylelint-checkstyle-formatter assets/sass/ > build2/OSW-stylelint-checkstyle-result.xml",
-    "lint": "grunt propertiesToJSON && mkdir -p build2 && run-p -c lint:eslint lint:stylelint",
-    "lint:report": "grunt propertiesToJSON && mkdir -p build2 && run-p -c lint:eslint:report lint:stylelint:report",
+    "lint": "grunt codegen && mkdir -p build2 && run-p -c lint:eslint lint:stylelint",
+    "lint:report": "grunt codegen && mkdir -p build2 && run-p -c lint:eslint:report lint:types:report lint:stylelint:report",
     "test:jest": "echo \"DEPRECATED: Please run 'yarn test -t jest' instead.\" && exit 1",
     "test:karma": "echo \"DEPRECATED: Please run 'yarn test -t karma' instead.\" && exit 1",
     "test": "node scripts/buildtools test",
@@ -60,9 +62,9 @@
     "start:test:app": "yarn workspace @okta/test.app start",
     "mock:device-authenticator": "dyson playground/mocks/spec-device-authenticator/ 6512",
     "clean:types": "rimraf ./types/generated",
-    "build:types": "ttsc --noEmit false --declaration --emitDeclarationOnly",
+    "generate:types": "ttsc --noEmit false --declaration --emitDeclarationOnly",
     "copy:types": "grunt copy:types",
-    "generate:types": "yarn clean:types && yarn build:types && yarn copy:types"
+    "build:types": "yarn clean:types && yarn generate:types && yarn copy:types"
   },
   "devDependencies": {
     "@babel/core": "^7.15.5",
@@ -98,7 +100,10 @@
     "dotenv": "^8.0.0",
     "dyson": "^4.1.0",
     "eslint": "^7.23.0",
+    "eslint-import-resolver-typescript": "^2.7.1",
+    "eslint-import-resolver-webpack": "^0.13.2",
     "eslint-plugin-compat": "^4.0.2",
+    "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jasmine": "^4.1.0",
     "eslint-plugin-json": "^2.1.2",
     "eslint-plugin-local-rules": "^0.1.1",
@@ -153,6 +158,7 @@
     "terser-webpack-plugin": "^5.2.4",
     "testcafe": "^1.14.2",
     "time-grunt": "^2.0.0",
+    "tsd": "^0.20.0",
     "ttypescript": "^1.5.13",
     "typescript": "^4.2.2",
     "wait-on": "^3.3.0",
@@ -167,7 +173,6 @@
     "handlebars": "^4.5.3",
     "jasmine": "^4.0.1",
     "q": "1.4.1",
-    "tsd": "^0.14.0",
     "u2f-api-polyfill": "0.4.3",
     "underscore": "1.13.1"
   },
@@ -192,5 +197,8 @@
       "**/@wdio/**"
     ]
   },
-  "packageManager": "yarn@1.22.17"
+  "packageManager": "yarn@1.22.17",
+  "tsd": {
+    "directory": "test/types"
+  }
 }

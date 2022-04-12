@@ -1,3 +1,4 @@
+/// <reference types="jquery" />
 import Backbone, { _Result } from 'backbone';
 export interface FrameworkCollectionFetchOptions extends Backbone.CollectionFetchOptions {
     fromFetch?: boolean;

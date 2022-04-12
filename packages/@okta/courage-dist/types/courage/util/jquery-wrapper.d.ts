@@ -1,4 +1,6 @@
 /// <reference types="jquery" />
+/// <reference types="jqueryui" />
+/// <reference types="selectize" />
 export interface OktaJQuery extends JQuery<HTMLElement> {
     scrollParent(includeHidden?: boolean): JQuery<HTMLElement>;
 }

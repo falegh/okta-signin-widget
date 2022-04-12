@@ -1,3 +1,4 @@
+/*
 import {
   SimpleCallback
 } from './api';
@@ -124,3 +125,4 @@ export interface Callbacks {
   ) => void;
 }
 
+*/

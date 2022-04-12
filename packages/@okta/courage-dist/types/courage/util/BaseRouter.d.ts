@@ -1,3 +1,4 @@
+/// <reference types="jquery" />
 import Backbone from 'backbone';
 import { SettingsModelClass } from './SettingsModel';
 import { BaseControllerClass } from './BaseController';

@@ -1,4 +1,12 @@
-import OktaSignIn from '@okta/okta-signin-widget';
+import OktaSignIn, {
+  EventCallback,
+  EventContext,
+  EventError,
+  RenderError,
+  OktaSignInAPI,
+  RouterEventsAPI,
+  EventCallbackWithError
+} from '@okta/okta-signin-widget';
 import { OktaAuth, Tokens } from '@okta/okta-auth-js';
 import { expectType, expectError, expectAssignable } from 'tsd';
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -6,10 +14,15 @@ import { expectType, expectError, expectAssignable } from 'tsd';
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 // Test simple constructor. Only baseUrl is required
-const signIn = new OktaSignIn({
+const signIn: OktaSignIn = new OktaSignIn({
   baseUrl: 'https://{yourOktaDomain}',
 });
 expectType<OktaSignIn>(signIn);
+
+// Test that instance can be assigned to the available interfaces
+expectAssignable<OktaSignInAPI>(signIn);
+expectAssignable<RouterEventsAPI>(signIn);
+
 // $ExpectError
 expectError(new OktaSignIn());
 
@@ -23,24 +36,28 @@ expectType<void>(signIn.hide());
 expectType<void>(signIn.remove());
 
 // Test event subscibe
-signIn.on('ready', (context) => {
+signIn.on('ready', (context: EventContext) => {
   expectType<string>(context.controller);
 });
-signIn.on('afterError', (context, error) => {
+signIn.on('afterError', (context: EventContext, error: EventError) => {
   expectType<string>(context.controller);
   expectType<string>(error.message);
   expectType<number | undefined>(error.statusCode);
   expectType<number | undefined>(error.xhr?.status);
 });
-signIn.on('afterRender', (context) => {
+signIn.on('afterRender', (context: EventContext) => {
   expectType<string>(context.controller);
 });
 
 // Test event unsubscribe
-const errorCallback: OktaSignIn.EventCallbackWithError = (_context, _error) => {};
-expectType<void>(signIn.off('afterError', errorCallback));
+const eventCallback: EventCallbackWithError = (_context: EventContext) => {};
+const eventCallbackWithError: EventCallbackWithError = (_context: EventContext, _error: EventError) => {};
+expectType<void>(signIn.off('afterError', eventCallbackWithError));
+expectType<void>(signIn.off('ready', eventCallbackWithError));
+
 // $ExpectError
-expectError(signIn.off('ready', errorCallback));
+// expectError(signIn.off('afterError', eventCallback)); // TODO: callback must have error parameter
+expectType<void>(signIn.off('ready', eventCallback));
 expectType<void>(signIn.off('ready'));
 expectType<void>(signIn.off());
 
@@ -56,8 +73,8 @@ expectType<Promise<Tokens>>(
 signIn.showSignInToGetTokens({
   el: '#container',
 }).then((tokens) => {
-  expectType<string | undefined>(tokens.accessToken?.value);
-}).catch((err: OktaSignIn.RenderError) => {
+  expectType<string | undefined>(tokens.accessToken?.accessToken);
+}).catch((err: RenderError) => {
   expectType<string>(err.message);
 });
 
@@ -86,7 +103,7 @@ case 'REGISTRATION_COMPLETE':
   break;
 case 'SUCCESS':
   // OIDC
-  expectType<string | undefined>(renderRes.tokens?.accessToken?.value);
+  expectType<string | undefined>(renderRes.tokens?.accessToken?.accessToken);
   // non-OIDC
   expectType<string | undefined>(renderRes.user?.profile.firstName);
   if (renderRes.type === 'SESSION_SSO') {
@@ -106,17 +123,17 @@ const signIn2 = new OktaSignIn({
   clientId: '{yourClientId}',
   redirectUri: '{{redirectUri configured in OIDC app}}',
   authParams: {
-    display: 'page',
+    // display: 'page',
     responseType: ['id_token', 'token'],
     scopes: ['openid', 'email', 'profile', 'address', 'phone'],
     state: '8rFzn3MH5q',
     responseMode: 'form_post',
-    nonce: '51GePTswrm',
+    // nonce: '51GePTswrm',
     pkce: false,
     issuer: 'https://{yourOktaDomain}/oauth2/default',
     clientId: '{yourClientId}',
     authorizeUrl: 'https://{yourOktaDomain}/oauth2/default/v1/authorize',
-    authScheme: 'OAUTH2',
+    // authScheme: 'OAUTH2',
   },
   logo: '/path/to/logo.png',
   logoText: 'logo text',
@@ -190,7 +207,7 @@ const signIn2 = new OktaSignIn({
       window.location.href = 'https://www.example.com';
     }
   }],
-  registration: {
+  /* registration: {
     click: () => {
       window.location.href = 'https://acme.com/sign-up';
     },
@@ -201,7 +218,7 @@ const signIn2 = new OktaSignIn({
         default: 'Enter your street address',
         maxLength: 255
       };
-      const countryCode: OktaSignIn.Registration.FieldStringWithFormatAndEnum = {
+      const countryCode: FieldStringWithFormatAndEnum = {
         type: 'country_code',
         enum: ['US', 'CA'],
         oneOf: [
@@ -237,7 +254,7 @@ const signIn2 = new OktaSignIn({
     postSubmit: (response, onSuccess, _onFailure) => {
       onSuccess(response);
     }
-  },
+  },*/
   features: {
     registration: true,
     idpDiscovery: true,
@@ -286,7 +303,11 @@ expectType<OktaSignIn>(new OktaSignIn({
   }
 }));
 
+expectType<OktaSignIn>(new OktaSignIn({
+  language: 'byol',
+}));
+
 expectError(new OktaSignIn({
   // $ExpectError
-  language: 'unsupported',
+  language: false,
 }));
