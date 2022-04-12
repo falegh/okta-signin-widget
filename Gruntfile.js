@@ -426,14 +426,22 @@ module.exports = function(grunt) {
     }
   );
 
+  grunt.task.registerTask('codegen', function() {
+    const tasks = [
+      'propertiesToJSON', // convert .properties to .json
+      'exec:generate-config', // populates src/config.json with supported languages
+      'exec:generate-types', // generate typescript declaration files
+    ];
+    grunt.task.run(tasks);
+  });
+
   grunt.task.registerTask('assets', function(target) {
     const prodBuild = target === 'release';
     const buildTasks = [
       'copy:generate-in-translation',
-      'propertiesToJSON',
+      'codegen',
       'copy:app-to-target',
       // 'exec:pseudo-loc', // TODO: Add after OKTA-379995 is completed
-      'exec:generate-config', // populates src/config.json with supported languages
       'sass:build',
     ];
 
@@ -462,7 +470,6 @@ module.exports = function(grunt) {
     grunt.task.run([
       'exec:clean',
       `assets:${target}`,
-      'exec:generate-types',
       ...buildTasks,
       'exec:retirejs',
       ...postBuildTasks,
