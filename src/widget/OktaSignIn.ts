@@ -24,7 +24,7 @@ declare type AbstractRouter = typeof V1Router | typeof V2Router;
 
 const EVENTS_LIST = ['ready', 'afterError', 'afterRender'];
 
-class OktaSignIn implements OktaSignInAPI {
+export class OktaSignIn implements OktaSignInAPI {
   Router: AbstractRouter;
   options: WidgetOptions;
   hooks: Hooks;
@@ -210,5 +210,3 @@ class OktaSignIn implements OktaSignInAPI {
     this.Router.prototype.Events.trigger.apply(this, args);
   }
 }
-
-export default OktaSignIn;

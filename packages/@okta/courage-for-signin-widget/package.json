@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Generates a version of Courage for Sign-In Widget",
   "main": "src/CourageForSigninWidget.js",
+  "type": "module",
   "scripts": {
     "prebuild": "yarn link:courage",
     "link:courage": "pushd ./src && ln -shf ../node_modules/@okta/courage/src ./courage && popd",

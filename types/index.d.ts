@@ -1,3 +1,3 @@
-export * from './generated/src';
-import OktaSignin from './generated/src/widget/OktaSignIn';
-export default OktaSignin;
+import { OktaSignIn } from './generated/src/widget/OktaSignIn';
+export default OktaSignIn;
+export * from './generated/src/types';

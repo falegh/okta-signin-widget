@@ -1,8 +1,17 @@
 /* global module __dirname */
-const { resolve } = require('path');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-const { BannerPlugin } = require('webpack');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+import { resolve } from 'path';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import webpack from 'webpack';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import { createRequire } from "module";
+import { URL } from 'url'; // in Browser, the URL in native accessible on window
+
+const __filename = new URL('', import.meta.url).pathname;
+// Will contain trailing slash
+const __dirname = new URL('.', import.meta.url).pathname;
+const { BannerPlugin } = webpack;
+const require = createRequire(import.meta.url);
+
 const PACKAGE_JSON = require('./package.json');
 
 const EMPTY = resolve(__dirname, 'src/empty');
@@ -63,9 +72,17 @@ const webpackConfig = {
     // node_modules at root directory.
     path: PUBLISH_DIR,
     filename: `${DIST_FILE_NAME}.js`,
-    libraryTarget: 'commonjs2'
+    library: {
+      type: 'module',
+      // 
+    }
+    // libraryTarget: 'commonjs2'
+  },
+  experiments: {
+    outputModule: true
   },
   externals: EXTERNAL_PATHS,
+  externalsType: 'node-commonjs',
   resolve: {
     extensions: ['.js', '.ts'],
     alias: {
@@ -99,7 +116,10 @@ const webpackConfig = {
         test: /\.[jt]s$/,
         exclude: babelExclude,
         loader: 'babel-loader',
-        options: babelOptions
+        options: babelOptions,
+        resolve: {
+          fullySpecified: false,
+        }
       },
     ]
   },
@@ -140,4 +160,4 @@ const webpackConfig = {
 
 };
 
-module.exports = webpackConfig;
+export default webpackConfig;

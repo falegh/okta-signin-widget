@@ -19,7 +19,9 @@ module.exports = function(grunt) {
       DIST                  = 'dist/dist',
       SASS                  = 'target/sass',
       I18N_SRC              = 'packages/@okta/i18n/src',
-      COURAGE_TYPES         = 'packages/@okta/courage-dist/types',
+      COURAGE_DIST          = 'packages/@okta/courage-dist',
+      QTIP                  = 'packages/@okta/qtip2/dist',
+      VENDOR                = 'packages/vendor',
       // Note: 3000 is necessary to test against certain browsers in SauceLabs
       DEFAULT_SERVER_PORT   = 3000;
 
@@ -33,11 +35,11 @@ module.exports = function(grunt) {
         files: [
           {
             expand: true,
-            cwd: COURAGE_TYPES,
+            cwd: `${COURAGE_DIST}/types`,
             src: [
               '**/*.d.ts'
             ],
-            dest: `types/generated/${COURAGE_TYPES}`
+            dest: `types/generated/${COURAGE_DIST}/types`
           }
         ]
       },
@@ -92,6 +94,50 @@ module.exports = function(grunt) {
           },
         ]
       },
+
+      'lib-to-dist': {
+        files: [
+          // courage
+          {
+            expand: true,
+            cwd: COURAGE_DIST,
+            src: ['okta.js'],
+            dest: 'dist/src/lib'
+          },
+          // nls
+          {
+            expand: true,
+            cwd: `${I18N_SRC}/json`,
+            src: [
+              '{login,country}*.json',
+            ],
+            dest: 'dist/src/nls/'
+          },
+          // duo
+          {
+            expand: true,
+            cwd: `${VENDOR}/duo_web_sdk`,
+            src: ['index.js'],
+            dest: 'dist/src/lib',
+            rename: (dest) => `${dest}/duo.js`
+          },
+          // typingdna
+          {
+            expand: true,
+            cwd: `${VENDOR}/TypingDnaRecorder-JavaScript`,
+            src: ['typingdna.js'],
+            dest: 'dist/src/lib'
+          },
+          // qtip
+          {
+            expand: true,
+            cwd: QTIP,
+            src: ['jquery.qtip.min.js'],
+            dest: 'dist/src/lib'
+          },
+        ]
+      },
+
 
       'target-to-dist': {
         files: [

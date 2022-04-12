@@ -9,8 +9,15 @@ module.exports = {
     'ecmaVersion': 2017
   },
   'plugins': [
-    '@typescript-eslint'
+    '@typescript-eslint',
+    'import',
+    'compat'
   ],
+  'settings': {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts']
+    },
+  },
   'overrides': [
     {
       // temporarily ignoring files that violate the @okta/okta/no-exclusive-language rule
@@ -83,16 +90,23 @@ module.exports = {
       },
     },
     {
-      'files': ['src/**/*.js'],
+      'files': ['src/**/*'],
       'extends': [
         'plugin:compat/recommended',
+        'plugin:import/recommended'
       ],
       'settings': {
+        'import/resolver': {
+          'typescript': {
+            'project': './'
+          }
+        },
         'polyfills': [
           'Promise' // Assume Promise is polyfilled for IE11
         ]
       },
       'rules': {
+        'import/no-named-as-default-member': 0, // TODO: enable and fix usage with Q
         'local-rules/no-bare-templates': 2, // we dont want no-bare-templates rule to be applied to test files
       },
       'env': {
@@ -147,6 +161,6 @@ module.exports = {
         '@typescript-eslint/no-empty-function': 0,
         '@typescript-eslint/explicit-module-boundary-types': 0
       }
-    }
+    },
   ],
 };

@@ -20,6 +20,9 @@
       "nls/*": ["./packages/@okta/i18n/src/json/*"],
       "okta": ["./packages/@okta/courage-dist/types/CourageForSigninWidget.d.ts"],
       "handlebars-inline-precompile": ["./scripts/buildtools/tsc/handlebars-inline-precompile"],
+      "duo": ["./packages/vendor/duo_web_sdk/index.js"],
+      "qtip": ["./packages/@okta/qtip2/dist/jquery.qtip.min.js"],
+      "typingdna": ["./packages/vendor/TypingDnaRecorder-JavaScript/typingdna"],
       "*": ["./src/*"]
     }
   },
@@ -29,9 +32,10 @@
   ],
   "exclude": [
     "target/**/*",
-    "types/generated/**/*"
+    "src/index.esm.tsted/**/*",
+    "src/index.cjs.js"
   ],
   "files": [
-    "src/index.ts"
+    "src/types/index.ts"
   ]
 }
